@@ -53,8 +53,8 @@ public class XcMusicPlayerManager {
         try {
             String target = Utils.parseUrl(url);
             if(target != null){
-                // 停止同名实例
-                stopInstance(instanceName);
+                // 停止同名实例并等待其完全停止
+                stopInstanceAndWait(instanceName);
                 
                 // 创建新实例
                 XcMusicPlayer player = new XcMusicPlayer(target, instanceName);
@@ -79,8 +79,8 @@ public class XcMusicPlayerManager {
         try {
             String target = Utils.parseUrl(url);
             if(target != null){
-                // 停止同名实例
-                stopInstance(instanceName);
+                // 停止同名实例并等待其完全停止
+                stopInstanceAndWait(instanceName);
                 
                 // 创建新实例并设置淡入
                 XcMusicPlayer player = new XcMusicPlayer(target, instanceName);
@@ -148,6 +148,28 @@ public class XcMusicPlayerManager {
         XcMusicPlayer player = instances.remove(instanceName);
         if(player != null){
             player.shutdown = true;
+        }
+    }
+
+    /**
+     * 停止单个实例并等待其完全停止
+     * 用于确保在启动新实例前，旧实例已完全清理
+     */
+    private static void stopInstanceAndWait(String instanceName) {
+        XcMusicPlayer player = instances.remove(instanceName);
+        if(player != null){
+            player.shutdown = true;
+            
+            // 等待播放器线程完全停止（最多等待500ms）
+            int waitCount = 0;
+            while(!player.isClosed() && waitCount < 50){
+                try {
+                    Thread.sleep(10);
+                    waitCount++;
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
         }
     }
 

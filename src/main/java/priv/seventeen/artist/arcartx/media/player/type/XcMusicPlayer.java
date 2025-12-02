@@ -38,6 +38,8 @@ public class XcMusicPlayer {
     private final String instanceName;
 
     public volatile boolean shutdown = false;
+    
+    @Getter
     private volatile boolean closed = false;
 
     @Getter @Setter
@@ -77,9 +79,10 @@ public class XcMusicPlayer {
             long elapsed = System.currentTimeMillis() - fadeStartTime;
             if(elapsed >= fadeDuration){
                 // 淡入淡出结束
+                boolean wasFadingOut = fadeOut;  // 先保存状态
                 fadeIn = false;
                 fadeOut = false;
-                if(fadeOut){
+                if(wasFadingOut){
                     // 淡出完成，停止播放
                     shutdown = true;
                 }
