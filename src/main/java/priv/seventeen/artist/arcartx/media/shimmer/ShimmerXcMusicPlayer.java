@@ -60,6 +60,21 @@ public class ShimmerXcMusicPlayer {
     }
 
     /**
+     * 淡出淡入播放音乐
+     * 如果实例存在，先淡出当前音乐，然后淡入播放新音乐
+     * 用法：XcMusicPlayer.fadeOutInPlay('example','3000','music.mp3')
+     */
+    @ShimmerInvokeHandler("fadeOutInPlay")
+    public static void fadeOutInPlay(InvocationData data){
+        if(data.size() >= 3){
+            String instanceName = data.get(0).stringValue();
+            long totalDuration = data.get(1).longValue();
+            String url = data.get(2).stringValue();
+            XcMusicPlayerManager.fadeOutInPlay(instanceName, totalDuration, url);
+        }
+    }
+
+    /**
      * 停止音乐
      * 用法：XcMusicPlayer.stop() - 停止所有实例
      * 或：XcMusicPlayer.stop('example') - 停止指定实例

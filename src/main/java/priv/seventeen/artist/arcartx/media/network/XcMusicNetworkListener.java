@@ -109,6 +109,11 @@ public class XcMusicNetworkListener implements Listener {
                     long duration = Long.parseLong(arg1);
                     XcMusicPlayerManager.fadeInPlay(duration, arg2, arg3);
                 }
+                case "fadeOutInPlay" -> {
+                    // 淡出淡入播放：arcartx_xcmusic fadeOutInPlay <instanceName> <totalDuration> <url>
+                    long totalDuration = Long.parseLong(arg2);
+                    XcMusicPlayerManager.fadeOutInPlay(arg1, totalDuration, arg3);
+                }
             }
         }
     }

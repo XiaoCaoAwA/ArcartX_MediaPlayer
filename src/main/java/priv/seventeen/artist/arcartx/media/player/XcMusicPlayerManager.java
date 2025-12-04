@@ -96,6 +96,54 @@ public class XcMusicPlayerManager {
     }
 
     /**
+     * 淡出淡入播放
+     * 如果实例存在，先淡出当前音乐，然后淡入播放新音乐
+     * @param instanceName 实例名称
+     * @param totalDuration 总时长（毫秒），会平均分配给淡出和淡入
+     * @param url 新音频URL
+     */
+    public static void fadeOutInPlay(String instanceName, long totalDuration, String url) {
+        executorService.submit(() -> {
+            try {
+                // 检查实例是否存在
+                XcMusicPlayer oldPlayer = instances.get(instanceName);
+                
+                if(oldPlayer != null){
+                    // 如果存在，先淡出停止（时长的一半）
+                    long fadeOutDuration = totalDuration / 2;
+                    oldPlayer.startFadeOut(fadeOutDuration);
+                    
+                    // 等待淡出完成
+                    try {
+                        Thread.sleep(fadeOutDuration);
+                    } catch (InterruptedException e) {
+                        // 被中断，继续执行
+                    }
+                    
+                    // 确保旧实例完全停止
+                    stopInstanceAndWait(instanceName);
+                }
+                
+                // 解析URL
+                String target = Utils.parseUrl(url);
+                if(target != null){
+                    // 创建新实例并淡入播放（时长的一半）
+                    long fadeInDuration = totalDuration / 2;
+                    XcMusicPlayer newPlayer = new XcMusicPlayer(target, instanceName);
+                    newPlayer.startFadeIn(fadeInDuration);
+                    instances.put(instanceName, newPlayer);
+                    
+                    // 播放新音乐
+                    newPlayer.play();
+                }
+            } catch (Exception e) {
+                // 失败时清理
+                stopInstance(instanceName);
+            }
+        });
+    }
+
+    /**
      * 停止指定实例
      * @param instanceName 实例名称，如果为null则停止所有实例
      */
